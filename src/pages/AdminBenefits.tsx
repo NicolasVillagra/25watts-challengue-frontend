@@ -26,6 +26,15 @@ const AdminBenefits: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState<{ code: string; description: string; value: number; expirationDate: string; status: CouponStatus }>({ code: "", description: "", value: 0, expirationDate: "", status: "active" });
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  // Min datetime for expiration (now, in local time) to prevent past dates
+  const minExpiration = React.useMemo(() => {
+    const now = new Date();
+    // Convert to local ISO string suitable for input[type=datetime-local]
+    const tzOffsetMs = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - tzOffsetMs).toISOString().slice(0, 16);
+  }, []);
 
   const logout = () => {
     localStorage.removeItem("role");
@@ -200,7 +209,8 @@ const AdminBenefits: React.FC = () => {
                     >
                       <option value="todos">ESTADO</option>
                       <option value="active">Activos</option>
-                      <option value="redeemed">Inactivos</option>
+                      <option value="inactive">Inactivos</option>
+                      <option value="redeemed">Canjeados</option>
                     </select>
                     <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">▾</span>
                   </div>
@@ -342,7 +352,8 @@ const AdminBenefits: React.FC = () => {
               </button>
             </div>
           </section>
-          {/* Modal Create Benefit */}
+          {/* Modal Create Benefit */
+          }
           {isOpen && (
             <div
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
@@ -353,9 +364,10 @@ const AdminBenefits: React.FC = () => {
                 <div className="flex items-center justify-between border-b px-6 py-4">
                   <h3 className="text-lg font-semibold text-[#0B2450]">Crear nuevo beneficio</h3>
                   <button
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => { if (!isSubmitting) { setIsOpen(false); setSubmitError(null);} }}
                     className="rounded-full p-1 text-gray-500 hover:bg-gray-100"
                     aria-label="Cerrar"
+                    disabled={isSubmitting}
                   >
                     ✕
                   </button>
@@ -363,19 +375,40 @@ const AdminBenefits: React.FC = () => {
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
-                    const created = await createCoupon({
-                      code: form.code,
-                      description: form.description,
-                      value: form.value,
-                      expirationDate: form.expirationDate,
-                      status: form.status,
-                    });
-                    setData((prev) => [created, ...prev]);
-                    setIsOpen(false);
-                    setPage(1);
+                    if (isSubmitting) return;
+                    setSubmitError(null);
+                    // Basic client-side validation
+                    if (!form.code.trim()) { setSubmitError('El código es requerido.'); return; }
+                    if (!form.description.trim()) { setSubmitError('La descripción es requerida.'); return; }
+                    if (form.value < 0) { setSubmitError('Los puntos deben ser 0 o mayores.'); return; }
+                    if (!form.expirationDate) { setSubmitError('La fecha de expiración es requerida.'); return; }
+                    if (new Date(form.expirationDate) < new Date()) { setSubmitError('La fecha de expiración no puede ser anterior a hoy.'); return; }
+                    try {
+                      setIsSubmitting(true);
+                      const created = await createCoupon({
+                        code: form.code,
+                        description: form.description,
+                        value: form.value,
+                        expirationDate: form.expirationDate,
+                        status: form.status,
+                      });
+                      setData((prev) => [created, ...prev]);
+                      setIsOpen(false);
+                      setPage(1);
+                    } catch (err: any) {
+                      const apiMsg = err?.response?.data?.message || err?.message || 'No se pudo crear el beneficio.';
+                      setSubmitError(apiMsg);
+                    } finally {
+                      setIsSubmitting(false);
+                    }
                   }}
                 >
                   <div className="space-y-4 px-6 py-5">
+                    {submitError && (
+                      <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        {submitError}
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
                         <label className="mb-1 block text-sm font-medium text-gray-700">Código</label>
@@ -384,6 +417,7 @@ const AdminBenefits: React.FC = () => {
                           value={form.code}
                           onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
                           required
+                          disabled={isSubmitting}
                         />
                       </div>
                       <div>
@@ -395,6 +429,7 @@ const AdminBenefits: React.FC = () => {
                           value={form.value}
                           onChange={(e) => setForm((f) => ({ ...f, value: Number(e.target.value) }))}
                           required
+                          disabled={isSubmitting}
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -405,6 +440,7 @@ const AdminBenefits: React.FC = () => {
                           value={form.description}
                           onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                           required
+                          disabled={isSubmitting}
                         />
                       </div>
                       <div>
@@ -415,6 +451,8 @@ const AdminBenefits: React.FC = () => {
                           value={form.expirationDate}
                           onChange={(e) => setForm((f) => ({ ...f, expirationDate: e.target.value }))}
                           required
+                          min={minExpiration}
+                          disabled={isSubmitting}
                         />
                       </div>
                       <div>
@@ -423,6 +461,7 @@ const AdminBenefits: React.FC = () => {
                           className="w-full appearance-none rounded-full border border-gray-200 bg-white px-4 py-2 text-sm focus:border-blue-300"
                           value={form.status}
                           onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as CouponStatus }))}
+                          disabled={isSubmitting}
                         >
                           <option value="active">Activo</option>
                           <option value="inactive">Inactivo</option>
@@ -433,16 +472,18 @@ const AdminBenefits: React.FC = () => {
                   <div className="flex items-center justify-end gap-2 border-t px-6 py-4">
                     <button
                       type="button"
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => { if (!isSubmitting) { setIsOpen(false); setSubmitError(null);} }}
                       className="rounded-full border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      disabled={isSubmitting}
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                      className={`rounded-full px-5 py-2 text-sm font-semibold text-white ${isSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+                      disabled={isSubmitting}
                     >
-                      Guardar
+                      {isSubmitting ? 'Guardando...' : 'Guardar'}
                     </button>
                   </div>
                 </form>
