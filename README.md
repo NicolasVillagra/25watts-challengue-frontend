@@ -35,7 +35,10 @@ Verifica tu versión con:
   - Carga desde `state` o, en su defecto, `getCoupon(id)`.
   - Guardar cambios con `updateCoupon`, eliminar con `deleteCoupon`.
   - Redirecciones a `/admin/benefits` post-acción.
-
+  
+## Credenciales de ADMIN
+-Email: admin@admin.com
+-password:admin123
 ## Enrutamiento
 
 - `/login` → `Login`
