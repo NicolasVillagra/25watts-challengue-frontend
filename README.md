@@ -23,6 +23,7 @@ Verifica tu versión con:
 - **Admin Dashboard**: `src/pages/AdminDashboard.tsx`
   - Guardia simple de rol (redirección a login si no es admin).
   - Accesos rápidos y opción de cerrar sesión.
+  - CREDENCIALES DE ADMIN: admin@admin.com contraseña: admin123
 
 - **Administración de Beneficios**: `src/pages/AdminBenefits.tsx`
   - Listado con búsqueda, filtros, orden, paginación.
