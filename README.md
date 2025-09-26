@@ -44,17 +44,7 @@ Verifica tu versión con:
 - `/admin/benefits` → `AdminBenefits` (requiere rol `admin`)
 - `/admin/benefits/:id` → `AdminBenefitEdit` (requiere rol `admin`)
 
-## API esperada (resumen)
 
-- **GET `/coupons`**: lista cupones. Params opcionales: `status`, `minValue`, `maxValue`, `expiresBefore`.
-- **GET `/coupons/:id`**: detalle de cupón por id.
-- **POST `/coupons`**: crea cupón. Body: `{ code, description, value, expirationDate, status? }`.
-- **PUT `/coupons/:id`**: actualiza cupón.
-- **DELETE `/coupons/:id`**: elimina cupón.
-- **POST `/redeem`**: canjea cupón. Body: `{ code }`.
-- **GET `/redemptions`**: lista de canjes (para KPIs del `Dashboard`).
-
-Estas rutas son consumidas por `src/api/coupons.ts` y `src/api/client.ts`.
 
 ## Pruebas
 
