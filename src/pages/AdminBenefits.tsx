@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { listCoupons, createCoupon, deleteCoupon, type Coupon, type CouponStatus } from "../api/coupons";
 
 const StatusPill: React.FC<{ status: CouponStatus }> = ({ status }) => (
@@ -67,22 +67,33 @@ const AdminBenefits: React.FC = () => {
           <div>
             <div className="mb-8 text-2xl font-bold tracking-widest">25Watts</div>
             <nav className="space-y-3">
-              <Link className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" to="/admin">
+              <NavLink
+                to="/admin"
+                end
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 ${isActive ? 'bg-white/10' : ''}`
+                }
+              >
                 <span>🏠</span>
                 <span>Inicio</span>
-              </Link>
-              <a className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" href="#">
+              </NavLink>
+              <button type="button" className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
                 <span>👥</span>
                 <span>Usuarios</span>
-              </a>
-              <a className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" href="#">
+              </button>
+              <button type="button" className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
                 <span>🛡️</span>
                 <span>Roles</span>
-              </a>
-              <Link className="flex items-center gap-3 rounded-lg px-3 py-2 bg-white/10" to="/admin/benefits">
+              </button>
+              <NavLink
+                to="/admin/benefits"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 ${isActive ? 'bg-white/10' : ''}`
+                }
+              >
                 <span>🎁</span>
                 <span>Beneficios</span>
-              </Link>
+              </NavLink>
               <Link className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" to="/login">
                 <span>🚪</span>
                 <span>Cerrar Sesión</span>

@@ -71,7 +71,6 @@ npm -v
 
 ```bash
 git clone <URL_DEL_REPO>
-cd coupons-frontend
 ```
 2) Instalar dependencias
 

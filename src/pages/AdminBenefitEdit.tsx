@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { getCoupon, updateCoupon, deleteCoupon, type Coupon, type CouponStatus } from "../api/coupons";
 
 const AdminBenefitEdit: React.FC = () => {
@@ -66,14 +66,25 @@ const AdminBenefitEdit: React.FC = () => {
           <div>
             <div className="mb-8 text-2xl font-bold tracking-widest">25Watts</div>
             <nav className="space-y-3">
-              <Link className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" to="/admin">
+              <NavLink
+                to="/admin"
+                end
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 ${isActive ? 'bg-white/10' : ''}`
+                }
+              >
                 <span>🏠</span>
                 <span>Inicio</span>
-              </Link>
-              <Link className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" to="/admin/benefits">
+              </NavLink>
+              <NavLink
+                to="/admin/benefits"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 ${isActive ? 'bg-white/10' : ''}`
+                }
+              >
                 <span>🎁</span>
                 <span>Beneficios</span>
-              </Link>
+              </NavLink>
               <button onClick={() => navigate('/login')} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 text-left">
                 <span>🚪</span>
                 <span>Cerrar Sesión</span>

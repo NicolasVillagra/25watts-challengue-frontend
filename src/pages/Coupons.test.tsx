@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Coupons from './Coupons'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock API module
 vi.mock('../api/coupons', () => {
