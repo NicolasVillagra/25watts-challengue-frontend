@@ -6,6 +6,7 @@ const AdminBenefitEdit: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation() as { state?: { benefit?: Coupon } };
+  const [mobileOpen, setMobileOpen] = React.useState(false);
 
   React.useEffect(() => {
     const role = localStorage.getItem("role");
@@ -58,11 +59,60 @@ const AdminBenefitEdit: React.FC = () => {
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem("role");
+    localStorage.removeItem("auth");
+    navigate("/login");
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
+    <div className="min-h-screen bg-gray-100 text-gray-900 overflow-x-hidden">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#0B2450] text-white p-6 flex flex-col justify-between">
+        {/* Mobile sidebar (drawer) */}
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+            <div className="relative h-full w-72 bg-[#0B2450] text-white p-6 flex flex-col justify-between">
+              <div>
+                <div className="mb-8 text-2xl font-bold tracking-widest">25Watts</div>
+                <nav className="space-y-3">
+                  <NavLink
+                    to="/admin"
+                    end
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 ${isActive ? 'bg-white/10' : ''}`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <span>🏠</span>
+                    <span>Inicio</span>
+                  </NavLink>
+                  <NavLink
+                    to="/admin/benefits"
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 ${isActive ? 'bg-white/10' : ''}`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <span>🎁</span>
+                    <span>Beneficios</span>
+                  </NavLink>
+                  <button onClick={() => { setMobileOpen(false); logout(); }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 text-left">
+                    <span>🚪</span>
+                    <span>Cerrar Sesión</span>
+                  </button>
+                </nav>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm opacity-80">Darkmode</div>
+                <button className="w-full rounded-full border border-white/30 px-4 py-2 hover:bg-white/10">🌙</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <aside className="hidden md:flex w-64 bg-[#0B2450] text-white p-6 flex-col justify-between">
           <div>
             <div className="mb-8 text-2xl font-bold tracking-widest">25Watts</div>
             <nav className="space-y-3">
@@ -85,7 +135,7 @@ const AdminBenefitEdit: React.FC = () => {
                 <span>🎁</span>
                 <span>Beneficios</span>
               </NavLink>
-              <button onClick={() => navigate('/login')} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 text-left">
+              <button onClick={logout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 text-left">
                 <span>🚪</span>
                 <span>Cerrar Sesión</span>
               </button>
@@ -101,7 +151,10 @@ const AdminBenefitEdit: React.FC = () => {
         <main className="flex-1 p-6 md:p-10">
           {/* Top bar */}
           <div className="mb-6 flex items-center justify-between">
-            <div className="text-xl font-semibold text-[#0B2450]">25Watts</div>
+            <div className="flex items-center gap-3">
+              <button className="md:hidden rounded-full bg-white px-3 py-2 shadow" onClick={()=>setMobileOpen(true)}>☰</button>
+              <div className="text-xl font-semibold text-[#0B2450]">25Watts</div>
+            </div>
             <div className="flex items-center gap-3">
               <button className="rounded-full bg-white px-3 py-2 shadow">🔔</button>
               <div className="h-9 w-9 overflow-hidden rounded-full bg-gray-300" />

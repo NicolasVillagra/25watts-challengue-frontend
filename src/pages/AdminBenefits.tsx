@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { listCoupons, createCoupon, deleteCoupon, type Coupon, type CouponStatus } from "../api/coupons";
 
 const StatusPill: React.FC<{ status: CouponStatus }> = ({ status }) => (
@@ -25,6 +25,13 @@ const AdminBenefits: React.FC = () => {
   const [data, setData] = useState<Coupon[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState<{ code: string; description: string; value: number; expirationDate: string; status: CouponStatus }>({ code: "", description: "", value: 0, expirationDate: "", status: "active" });
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  const logout = () => {
+    localStorage.removeItem("role");
+    localStorage.removeItem("auth");
+    navigate("/login");
+  };
 
   // Guard simple de rol admin
   React.useEffect(() => {
@@ -60,10 +67,61 @@ const AdminBenefits: React.FC = () => {
   const resetToFirst = () => setPage(1);
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
+    <div className="min-h-screen bg-gray-100 text-gray-900 overflow-x-hidden">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#0B2450] text-white p-6 flex flex-col justify-between">
+        {/* Mobile sidebar (drawer) */}
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+            <div className="relative h-full w-72 bg-[#0B2450] text-white p-6 flex flex-col justify-between">
+              <div>
+                <div className="mb-8 text-2xl font-bold tracking-widest">25Watts</div>
+                <nav className="space-y-3">
+                  <NavLink
+                    to="/admin"
+                    end
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 ${isActive ? 'bg-white/10' : ''}`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <span>🏠</span>
+                    <span>Inicio</span>
+                  </NavLink>
+                  <button type="button" className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
+                    <span>👥</span>
+                    <span>Usuarios</span>
+                  </button>
+                  <button type="button" className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
+                    <span>🛡️</span>
+                    <span>Roles</span>
+                  </button>
+                  <NavLink
+                    to="/admin/benefits"
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 ${isActive ? 'bg-white/10' : ''}`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <span>🎁</span>
+                    <span>Beneficios</span>
+                  </NavLink>
+                  <button onClick={() => { setMobileOpen(false); logout(); }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 text-left">
+                    <span>🚪</span>
+                    <span>Cerrar Sesión</span>
+                  </button>
+                </nav>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm opacity-80">Darkmode</div>
+                <button className="w-full rounded-full border border-white/30 px-4 py-2 hover:bg-white/10">🌙</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <aside className="hidden md:flex w-64 bg-[#0B2450] text-white p-6 flex-col justify-between">
           <div>
             <div className="mb-8 text-2xl font-bold tracking-widest">25Watts</div>
             <nav className="space-y-3">
@@ -94,10 +152,10 @@ const AdminBenefits: React.FC = () => {
                 <span>🎁</span>
                 <span>Beneficios</span>
               </NavLink>
-              <Link className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" to="/login">
+              <button onClick={logout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 text-left">
                 <span>🚪</span>
                 <span>Cerrar Sesión</span>
-              </Link>
+              </button>
             </nav>
           </div>
           <div className="space-y-2">
@@ -110,10 +168,13 @@ const AdminBenefits: React.FC = () => {
         <main className="flex-1 p-6 md:p-10">
           {/* Top bar */}
           <div className="mb-6 flex items-center justify-between">
-            <div className="text-xl font-semibold text-[#0B2450]">25Watts</div>
+            <div className="flex items-center gap-3">
+              <button className="md:hidden rounded-full bg-white px-3 py-2 shadow" onClick={()=>setMobileOpen(true)}>☰</button>
+              <div className="text-xl font-semibold text-[#0B2450]">25Watts</div>
+            </div>
             <div className="flex items-center gap-3">
               <button className="rounded-full bg-white px-3 py-2 shadow">🔔</button>
-              <div className="h-9 w-9 overflow-hidden rounded-full bg-gray-300" />
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=facearea&facepad=3&w=256&h=256&q=80" className="h-9 w-9 overflow-hidden rounded-full bg-gray-300" />
             </div>
           </div>
 
@@ -139,7 +200,7 @@ const AdminBenefits: React.FC = () => {
                     >
                       <option value="todos">ESTADO</option>
                       <option value="active">Activos</option>
-                      <option value="inactive">Inactivos</option>
+                      <option value="redeemed">Inactivos</option>
                     </select>
                     <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">▾</span>
                   </div>
@@ -171,9 +232,42 @@ const AdminBenefits: React.FC = () => {
               </div>
             </div>
 
-            {/* Table */}
-            <div className="overflow-hidden rounded-2xl border border-gray-100">
-              <table className="min-w-full divide-y divide-gray-100">
+            {/* Mobile list (cards) */}
+            <div className="md:hidden space-y-3">
+              {pageData.map((r) => (
+                <div key={r.id} className="rounded-2xl border border-gray-100 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold text-[#0B2450]">{r.code}</div>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${r.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{r.status.toUpperCase()}</span>
+                  </div>
+                  <div className="mt-1 text-sm text-gray-600">{r.description}</div>
+                  <div className="mt-2 text-xs text-gray-500">Puntos: {r.value} · Expira {new Date(r.expirationDate).toLocaleDateString()}</div>
+                  <div className="mt-3 flex justify-end gap-3 text-blue-600">
+                    <button
+                      title="Editar"
+                      onClick={() => navigate(`/admin/benefits/${r.id}`, { state: { benefit: r } })}
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      title="Eliminar"
+                      onClick={async () => {
+                        if (confirm('¿Eliminar beneficio?')) {
+                          await deleteCoupon(r.id)
+                          setData((prev) => prev.filter((x) => x.id !== r.id))
+                        }
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Table (desktop/tablet) */}
+            <div className="hidden md:block overflow-x-auto rounded-2xl border border-gray-100">
+              <table className="min-w-[720px] w-full divide-y divide-gray-100">
                 <thead className="bg-gray-50">
                   <tr className="text-left text-sm text-gray-600">
                     <th className="px-6 py-3 font-semibold">Código</th>

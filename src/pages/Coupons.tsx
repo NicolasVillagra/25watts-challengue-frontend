@@ -14,7 +14,7 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
 );
 
 const CouponCard: React.FC<{ data: Coupon; onRedeem: (code: string) => Promise<void> }> = ({ data, onRedeem }) => (
-  <div className="relative flex items-stretch gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+  <div className="relative flex flex-col md:flex-row items-start md:items-stretch gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
     {/* Ticket notch effect */}
     <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2">
       <div className="h-4 w-4 rounded-full bg-gray-100 shadow-[0_0_0_1px_rgba(0,0,0,0.06)]" />
@@ -42,10 +42,10 @@ const CouponCard: React.FC<{ data: Coupon; onRedeem: (code: string) => Promise<v
     </div>
 
     {/* Divider */}
-    <div className="mx-2 w-px bg-gray-200" />
+    <div className="mx-2 w-px bg-gray-200 hidden md:block" />
 
     {/* Right benefit */}
-    <div className="flex min-w-[220px] flex-col justify-center">
+    <div className="flex w-full md:min-w-[220px] flex-col justify-center md:w-auto md:ml-0">
       <div className="mb-2 flex items-center gap-2">
         <span className="flex h-8 w-12 items-center justify-center rounded bg-emerald-100 text-sm font-bold text-emerald-700">{data.value}</span>
         <div className="text-base font-semibold text-slate-900">Beneficio</div>
@@ -63,6 +63,7 @@ const Coupons: React.FC = () => {
   const [data, setData] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,10 +94,48 @@ const Coupons: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
+    <div className="min-h-screen bg-gray-100 text-gray-900 overflow-x-hidden">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#0B2450] text-white p-6 flex flex-col justify-between">
+        {/* Mobile sidebar (drawer) */}
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+            <div className="relative h-full w-72 bg-[#0B2450] text-white p-6 flex flex-col justify-between">
+              <div>
+                <div className="mb-8 text-2xl font-bold tracking-widest">LOGO</div>
+                <nav className="space-y-3 text-white">
+                  <Link className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" to="/dashboard" onClick={()=>setMobileOpen(false)}>
+                    <span>🏠</span>
+                    <span>Inicio</span>
+                  </Link>
+                  <a className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
+                    <span>👤</span>
+                    <span>Mi cuenta</span>
+                  </a>
+                  <a className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
+                    <span>🎁</span>
+                    <span>Mis beneficios</span>
+                  </a>
+                  <Link className="flex items-center gap-3 rounded-lg px-3 py-2 bg-white/10" to="/coupons" onClick={()=>setMobileOpen(false)}>
+                    <span>🏷️</span>
+                    <span>Mis cupones</span>
+                  </Link>
+                  <a className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
+                    <span>💬</span>
+                    <span>Recomendá</span>
+                  </a>
+                </nav>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm opacity-80">Darkmode</div>
+                <button className="w-full rounded-full border border-white/30 px-4 py-2 hover:bg-white/10">🌙</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <aside className="hidden md:flex w-64 bg-[#0B2450] text-white p-6 flex-col justify-between">
           <div>
             <div className="mb-8 text-2xl font-bold tracking-widest">LOGO</div>
             <nav className="space-y-3 text-white">
@@ -131,9 +170,15 @@ const Coupons: React.FC = () => {
         {/* Main */}
         <main className="flex-1 p-6 md:p-10">
           {/* Top bar */}
-          <div className="mb-6 flex items-center justify-end gap-4">
-            <button className="rounded-full bg-white px-3 py-2 shadow">🔔</button>
-            <div className="h-9 w-9 overflow-hidden rounded-full bg-gray-300" />
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button className="md:hidden rounded-full bg-white px-3 py-2 shadow" onClick={()=>setMobileOpen(true)}>☰</button>
+              <div className="text-xl font-semibold text-[#0B2450]">25Watts</div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button className="rounded-full bg-white px-3 py-2 shadow">🔔</button>
+              <img src="https://avatars.githubusercontent.com/u/104174?v=4" className="h-9 w-9 overflow-hidden rounded-full bg-gray-300" />
+            </div>
           </div>
 
           {/* Container card */}

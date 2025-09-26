@@ -8,6 +8,7 @@ const Dashboard: React.FC = () => {
   const [activeCoupons, setActiveCoupons] = React.useState<Coupon[]>([]);
   const [redeemedPoints, setRedeemedPoints] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
 
   React.useEffect(() => {
     const load = async () => {
@@ -31,11 +32,49 @@ const Dashboard: React.FC = () => {
   const level = redeemedPoints >= 500 ? 3 : redeemedPoints >= 200 ? 2 : 1;
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
+    <div className="min-h-screen bg-gray-100 text-gray-900 overflow-x-hidden">
       {/* Shell */}
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#0B2450] text-white p-6 flex flex-col justify-between">
+        {/* Mobile sidebar (drawer) */}
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+            <div className="relative h-full w-72 bg-[#0B2450] text-white p-6 flex flex-col justify-between">
+              <div>
+                <div className="mb-8 text-2xl font-bold tracking-widest">LOGO</div>
+                <nav className="space-y-3 text-white">
+                  <a className="flex text-white items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" href="#" onClick={()=>setMobileOpen(false)}>
+                    <span>🏠</span>
+                    <span>Inicio</span>
+                  </a>
+                  <a className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
+                    <span>👤</span>
+                    <span>Mi cuenta</span>
+                  </a>
+                  <a className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
+                    <span>🎁</span>
+                    <span>Mis beneficios</span>
+                  </a>
+                  <Link className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10" to="/coupons" onClick={()=>setMobileOpen(false)}>
+                    <span>🏷️</span>
+                    <span>Mis cupones</span>
+                  </Link>
+                  <a className="flex items-center gap-3 rounded-lg px-3 py-2 opacity-60 cursor-not-allowed select-none" onFocus={(e)=>e.currentTarget.blur()}>
+                    <span>💬</span>
+                    <span>Recomendá</span>
+                  </a>
+                </nav>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm opacity-80">Darkmode</div>
+                <button className="w-full rounded-full border border-white/30 px-4 py-2 hover:bg-white/10">🌙</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <aside className="hidden md:flex w-64 bg-[#0B2450] text-white p-6 flex-col justify-between">
           <div>
             <div className="mb-8 text-2xl font-bold tracking-widest">LOGO</div>
             <nav className="space-y-3 text-white">
@@ -70,9 +109,15 @@ const Dashboard: React.FC = () => {
         {/* Content */}
         <main className="flex-1 p-6 md:p-10">
           {/* Top bar */}
-          <div className="mb-6 flex items-center justify-end gap-4">
-            <button className="rounded-full bg-white px-3 py-2 shadow">🔔</button>
-            <div className="h-9 w-9 overflow-hidden rounded-full bg-gray-300" />
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button className="md:hidden rounded-full bg-white px-3 py-2 shadow" onClick={()=>setMobileOpen(true)}>☰</button>
+              <div className="text-xl font-semibold text-[#0B2450]">25Watts</div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button className="rounded-full bg-white px-3 py-2 shadow">🔔</button>
+              <img src="https://avatars.githubusercontent.com/u/104174?v=4" className="h-9 w-9 overflow-hidden rounded-full bg-gray-300" />
+            </div>
           </div>
 
           {/* Header */}
